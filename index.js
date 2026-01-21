@@ -1,210 +1,205 @@
 
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// --- CONFIGURACIÓN Y CONSTANTES ---
+// --- CONFIGURACIÓN ---
 const FORMATIVE_FIELDS = [
-  { id: 'lenguajes', name: 'Lenguajes', color: 'bg-indigo-600', lightColor: 'bg-indigo-50' },
-  { id: 'saberes', name: 'Saberes y Pensamiento Científico', color: 'bg-emerald-600', lightColor: 'bg-emerald-50' },
-  { id: 'etica', name: 'Ética, Naturaleza y Sociedades', color: 'bg-amber-600', lightColor: 'bg-amber-50' },
-  { id: 'humano', name: 'De lo Humano y lo Comunitario', color: 'bg-rose-600', lightColor: 'bg-rose-50' }
+  { id: 'lenguajes', name: 'Lenguajes', color: 'bg-indigo-600' },
+  { id: 'saberes', name: 'Saberes y Pensamiento Científico', color: 'bg-emerald-600' },
+  { id: 'etica', name: 'Ética, Naturaleza y Sociedades', color: 'bg-amber-600' },
+  { id: 'humano', name: 'De lo Humano y lo Comunitario', color: 'bg-rose-600' }
 ];
 
-const INITIAL_DATA = {
-  schoolName: '',
-  schoolYear: '2025 – 2026',
-  grade: '',
-  trimester: '',
-  projectName: '',
-  thematicSituation: '',
-  temporality: '',
-  totalSessions: '',
-  disciplines: [{ field: 'Lenguajes', discipline: '', content: '', pda: '', evaluation: '', activityGeneralities: '' }],
-  teachers: []
-};
+// --- COMPONENTES ---
 
-// --- COMPONENTE: HEADER ---
 const Header = ({ activeTab, setActiveTab, onPrint }) => (
-  <header className="no-print sticky top-0 z-50 bg-white border-b border-slate-200 px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+  <header className="no-print sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center text-white shadow-lg">
-        <i className="fas fa-microchip text-xl"></i>
+      <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+        <i className="fas fa-microchip"></i>
       </div>
       <div>
-        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">DIGITAL ENS</h1>
-        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Normal Superior "Profr. Moisés Sáenz Garza"</p>
+        <h1 className="text-lg font-bold text-slate-800">DIGITAL ENS</h1>
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Normal Superior "Moisés Sáenz Garza"</p>
       </div>
     </div>
     <nav className="flex bg-slate-100 p-1 rounded-xl">
-      <button onClick={() => setActiveTab('edit')} className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'edit' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600'}`}>Editor</button>
-      <button onClick={() => setActiveTab('preview')} className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'preview' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600'}`}>Vista Previa</button>
+      <button onClick={() => setActiveTab('edit')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'edit' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>EDITOR</button>
+      <button onClick={() => setActiveTab('preview')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'preview' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>VISTA PREVIA</button>
     </nav>
-    <button onClick={onPrint} className="hidden md:block bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-xl">Exportar PDF</button>
+    <button onClick={onPrint} className="bg-slate-900 text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-slate-800 transition-all">EXPORTAR PDF</button>
   </header>
 );
 
-// --- COMPONENTE: VISTA PREVIA ---
-const DocumentPreview = forwardRef(({ data }, ref) => {
-  const cellClass = "border border-black p-2 text-left align-top leading-tight";
-  const labelClass = "font-bold mr-1";
-  const headerClass = "bg-[#002060] text-white font-bold p-1 text-center border border-black uppercase text-[12px]";
+const ProjectForm = ({ data, setData }) => {
+  const updateDisc = (idx, fields) => {
+    const next = [...data.disciplines];
+    next[idx] = { ...next[idx], ...fields };
+    setData({ ...data, disciplines: next });
+  };
+
+  const addDisc = () => setData({
+    ...data, 
+    disciplines: [...data.disciplines, { field: 'Lenguajes', discipline: '', content: '', pda: '', evaluation: '', activityGeneralities: '' }]
+  });
+
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 outline-none text-sm transition-all";
+  const labelClass = "text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1";
 
   return (
-    <div id="printable-area" className="bg-white mx-auto p-[2cm] text-[10.5px] max-w-[21.59cm] min-h-[27.94cm] text-black transition-all flex flex-col">
-      <div className="mb-6 flex justify-between items-start border-b-2 border-black pb-4">
-        <div className="w-2/3 space-y-1">
-          <p className="font-bold text-[14px] uppercase">{data.schoolName || 'Escuela Normal Superior Profr. Moisés Sáenz Garza'}</p>
-          <p className="font-bold">Ciclo: <span className="font-normal">{data.schoolYear}</span></p>
-          <p className="font-bold">Grado: <span className="font-normal">{data.grade || 'Pendiente'}</span></p>
+    <div className="p-6 md:p-10 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-3xl">
+        <div><label className={labelClass}>Nombre de la Escuela</label><input className={inputClass} value={data.schoolName} onChange={e => setData({...data, schoolName: e.target.value})} placeholder="Ej. Secundaria #1" /></div>
+        <div><label className={labelClass}>Nombre del Proyecto</label><input className={inputClass} value={data.projectName} onChange={e => setData({...data, projectName: e.target.value})} placeholder="Ej. Huerto Escolar" /></div>
+        <div><label className={labelClass}>Grado</label><input className={inputClass} value={data.grade} onChange={e => setData({...data, grade: e.target.value})} placeholder="Ej. 1° Grado" /></div>
+        <div><label className={labelClass}>Temporalidad</label><input className={inputClass} value={data.temporality} onChange={e => setData({...data, temporality: e.target.value})} placeholder="Ej. 2 semanas" /></div>
+      </div>
+
+      <div className="space-y-6">
+        {data.disciplines.map((d, i) => (
+          <div key={i} className="border border-slate-100 p-6 rounded-3xl bg-white shadow-sm relative group">
+            <button onClick={() => setData({...data, disciplines: data.disciplines.filter((_, idx) => idx !== i)})} className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><i className="fas fa-trash-alt"></i></button>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className={labelClass}>Campo Formativo</label>
+                <select className={inputClass} value={d.field} onChange={e => updateDisc(i, { field: e.target.value })}>
+                  {FORMATIVE_FIELDS.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
+                </select>
+              </div>
+              <div><label className={labelClass}>Disciplina</label><input className={inputClass} value={d.discipline} onChange={e => updateDisc(i, { discipline: e.target.value })} /></div>
+              <div><label className={labelClass}>Contenido</label><textarea className={inputClass} value={d.content} onChange={e => updateDisc(i, { content: e.target.value })} /></div>
+              <div><label className={labelClass}>PDA (Procesos de Desarrollo)</label><textarea className={inputClass} value={d.pda} onChange={e => updateDisc(i, { pda: e.target.value })} /></div>
+              <div><label className={labelClass}>Orientaciones y Actividades</label><textarea className={`${inputClass} h-32`} value={d.activityGeneralities} onChange={e => updateDisc(i, { activityGeneralities: e.target.value })} /></div>
+            </div>
+          </div>
+        ))}
+        <button onClick={addDisc} className="w-full py-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:bg-indigo-50 transition-all hover:text-indigo-600 hover:border-indigo-200">+ AGREGAR DISCIPLINA</button>
+      </div>
+    </div>
+  );
+};
+
+const DocumentPreview = forwardRef(({ data }, ref) => {
+  const cellClass = "border border-black p-2 text-left align-top text-[10px]";
+  const headerClass = "bg-[#002060] text-white font-bold p-1 text-center border border-black uppercase text-[11px]";
+
+  return (
+    <div id="printable-area" className="bg-white mx-auto p-[1.5cm] md:p-[2cm] max-w-[21.59cm] min-h-[27.94cm] text-black shadow-inner">
+      <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
+        <div className="w-2/3">
+          <p className="font-bold text-[14px] uppercase">{data.schoolName || 'Escuela Normal Superior'}</p>
+          <p className="text-[10px] font-bold">Ciclo: <span className="font-normal">{data.schoolYear}</span></p>
+          <p className="text-[10px] font-bold">Grado: <span className="font-normal">{data.grade || '___'}</span></p>
         </div>
-        <div className="w-1/3 text-right space-y-1">
-          <p className="font-bold">Trimestre: <span className="font-normal uppercase">{data.trimester || 'No asignado'}</span></p>
-          <p className="font-bold">Temporalidad: <span className="font-normal">{data.temporality || 'Pendiente'}</span></p>
+        <div className="w-1/3 text-right">
+          <p className="text-[10px] font-bold uppercase">Planeación Codiseño</p>
+          <p className="text-[10px] font-bold">Temporalidad: <span className="font-normal">{data.temporality || '___'}</span></p>
         </div>
       </div>
-      <div className="w-full mb-6">
-        <div className={headerClass}>1. Proyecto interdisciplinario - Codiseño</div>
-        <table className="w-full border-collapse border border-black">
+
+      <div className="mb-6">
+        <div className={headerClass}>1. Proyecto Interdisciplinario</div>
+        <table className="w-full border-collapse">
           <tbody>
             <tr>
               <td className={cellClass} colSpan="2">
-                <span className={labelClass}>1.3 Nombre del proyecto:</span>
-                <span className="text-[12px] font-bold uppercase">{data.projectName || 'Sin nombre'}</span>
-              </td>
-            </tr>
-            <tr>
-              <td className={cellClass}>
-                <span className={labelClass}>1.4 Situación temática:</span><br/>{data.thematicSituation}
-              </td>
-              <td className={cellClass}>
-                <span className={labelClass}>1.5 Temporalidad:</span><br/>{data.temporality}
+                <span className="font-bold">Nombre del Proyecto:</span> {data.projectName || 'Sin definir'}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
       {data.disciplines.map((d, i) => (
         <div key={i} className="mb-6 break-inside-avoid">
-          <table className="w-full border-collapse border border-black">
+          <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-50 text-[9px]">
-                <th className="w-1/2 p-2 text-left border border-black font-bold uppercase">2.1 Campo: {d.field}</th>
-                <th className="w-1/2 p-2 text-left border border-black font-bold uppercase">2.2 Disciplina: {d.discipline}</th>
+              <tr className="bg-slate-50">
+                <th className={`${cellClass} font-bold`}>Campo: {d.field}</th>
+                <th className={`${cellClass} font-bold`}>Disciplina: {d.discipline}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className={cellClass}><span className={labelClass}>2.3 Contenido:</span><br/>{d.content}</td>
-                <td className={cellClass}><span className={labelClass}>2.4 PDA:</span><br/>{d.pda}</td>
+                <td className={cellClass}><span className="font-bold">Contenido:</span><br/>{d.content}</td>
+                <td className={cellClass}><span className="font-bold">PDA:</span><br/>{d.pda}</td>
               </tr>
               <tr>
-                <td colSpan="2" className={cellClass}>
-                  <span className={labelClass}>2.5 Orientaciones generales:</span><br/>
-                  <div className="whitespace-pre-wrap">{d.activityGeneralities}</div>
+                <td className={cellClass} colSpan="2">
+                  <span className="font-bold">Orientaciones Generales:</span><br/>
+                  <div className="whitespace-pre-wrap mt-1">{d.activityGeneralities}</div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       ))}
-      <div className="mt-auto pt-12 flex flex-col items-center">
-        <div className="w-64 border-t border-black mb-1"></div>
-        <p className="font-bold text-[10px] uppercase">Vo. Bo. Dirección Escolar</p>
+
+      <div className="mt-20 flex flex-col items-center">
+        <div className="w-48 border-t border-black mb-1"></div>
+        <p className="text-[9px] font-bold uppercase">Vo. Bo. Dirección Escolar</p>
       </div>
     </div>
   );
 });
 
-// --- COMPONENTE: FORMULARIO ---
-const ProjectForm = ({ data, updateData }) => {
-  const inputStyles = "px-4 py-3 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none";
-  const labelStyles = "text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1";
-
-  const addDiscipline = () => {
-    updateData({ disciplines: [...data.disciplines, { field: 'Lenguajes', discipline: '', content: '', pda: '', activityGeneralities: '' }] });
-  };
-
-  const updateDisc = (idx, updates) => {
-    const next = [...data.disciplines];
-    next[idx] = { ...next[idx], ...updates };
-    updateData({ disciplines: next });
-  };
-
-  return (
-    <div className="p-6 md:p-10 space-y-10">
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-3xl">
-        <div className="flex flex-col"><label className={labelStyles}>Nombre Escuela</label><input className={inputStyles} value={data.schoolName} onChange={e => updateData({ schoolName: e.target.value })} /></div>
-        <div className="flex flex-col"><label className={labelStyles}>Nombre del Proyecto</label><input className={inputStyles} value={data.projectName} onChange={e => updateData({ projectName: e.target.value })} /></div>
-        <div className="flex flex-col"><label className={labelStyles}>Grado</label><input className={inputStyles} value={data.grade} onChange={e => updateData({ grade: e.target.value })} /></div>
-        <div className="flex flex-col"><label className={labelStyles}>Temporalidad</label><input className={inputStyles} value={data.temporality} onChange={e => updateData({ temporality: e.target.value })} /></div>
-      </section>
-
-      {data.disciplines.map((d, idx) => (
-        <div key={idx} className="border border-slate-200 p-6 rounded-3xl relative">
-          <div className="grid grid-cols-1 gap-4">
-             <div className="flex flex-col"><label className={labelStyles}>Campo Formativo</label>
-               <select className={inputStyles} value={d.field} onChange={e => updateDisc(idx, { field: e.target.value })}>
-                 {FORMATIVE_FIELDS.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
-               </select>
-             </div>
-             <div className="flex flex-col"><label className={labelStyles}>Disciplina</label><input className={inputStyles} value={d.discipline} onChange={e => updateDisc(idx, { discipline: e.target.value })} /></div>
-             <div className="flex flex-col"><label className={labelStyles}>Contenido</label><textarea className={inputStyles} value={d.content} onChange={e => updateDisc(idx, { content: e.target.value })} /></div>
-             <div className="flex flex-col"><label className={labelStyles}>PDA</label><textarea className={inputStyles} value={d.pda} onChange={e => updateDisc(idx, { pda: e.target.value })} /></div>
-             <div className="flex flex-col"><label className={labelStyles}>Orientaciones</label><textarea className={`${inputStyles} h-32`} value={d.activityGeneralities} onChange={e => updateDisc(idx, { activityGeneralities: e.target.value })} /></div>
-          </div>
-        </div>
-      ))}
-      <button onClick={addDiscipline} className="w-full py-4 border-2 border-dashed border-slate-300 rounded-3xl text-slate-400 font-bold hover:bg-indigo-50 transition-all">+ Nueva Disciplina</button>
-    </div>
-  );
-};
-
-// --- COMPONENTE: APP PRINCIPAL ---
+// --- APP PRINCIPAL ---
 const App = () => {
-  const [data, setData] = useState(INITIAL_DATA);
+  const [data, setData] = useState({
+    schoolName: '',
+    schoolYear: '2025-2026',
+    grade: '',
+    projectName: '',
+    temporality: '',
+    disciplines: [{ field: 'Lenguajes', discipline: '', content: '', pda: '', activityGeneralities: '' }]
+  });
   const [activeTab, setActiveTab] = useState('edit');
-  const [isPreparingPDF, setIsPreparingPDF] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const updateData = (newData) => setData(prev => ({ ...prev, ...newData }));
-
-  const handleDownloadPDF = async () => {
+  const handleExport = async () => {
+    setLoading(true);
     const element = document.getElementById('printable-area');
-    if (!element) return;
-    setIsPreparingPDF(true);
-    if (activeTab !== 'preview') {
-      setActiveTab('preview');
-      await new Promise(r => setTimeout(r, 500));
-    }
-    const opt = { margin: 10, filename: 'planeacion.pdf', jsPDF: { unit: 'mm', format: 'letter' } };
+    const opt = { 
+      margin: 10, 
+      filename: 'Planeacion_ENS.pdf', 
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+    };
     try {
+      if (activeTab !== 'preview') {
+        setActiveTab('preview');
+        await new Promise(r => setTimeout(r, 600));
+      }
       await html2pdf().set(opt).from(element).save();
     } catch (e) {
       window.print();
     } finally {
-      setIsPreparingPDF(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {isPreparingPDF && (
-        <div className="fixed inset-0 z-[9999] bg-slate-900/90 flex flex-col items-center justify-center text-white">
+    <div className="min-h-screen flex flex-col selection:bg-indigo-100">
+      {loading && (
+        <div className="fixed inset-0 z-[100] bg-white/90 flex flex-col items-center justify-center animate-pulse">
           <div className="loader-spin mb-4"></div>
-          <p className="font-bold text-lg">Preparando Documento...</p>
+          <p className="text-xs font-bold text-slate-800 tracking-widest uppercase">Generando PDF...</p>
         </div>
       )}
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} onPrint={handleDownloadPDF} />
-      <main className="flex-grow p-4 md:p-12">
-        <div className="max-w-5xl mx-auto bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200">
-          {activeTab === 'edit' ? <ProjectForm data={data} updateData={updateData} /> : <DocumentPreview data={data} />}
+      <Header activeTab={activeTab} setActiveTab={setActiveTab} onPrint={handleExport} />
+      <main className="flex-grow p-4 md:p-10">
+        <div className="max-w-5xl mx-auto bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
+          {activeTab === 'edit' ? <ProjectForm data={data} setData={setData} /> : <DocumentPreview data={data} />}
         </div>
       </main>
-      <footer className="py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-        DIGITAL ENS © 2025 | Escuela Normal Superior
+      <footer className="py-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        Digital ENS © 2025 | Escuela Normal Superior "Moisés Sáenz Garza"
       </footer>
     </div>
   );
 };
 
+// Renderizado
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);
