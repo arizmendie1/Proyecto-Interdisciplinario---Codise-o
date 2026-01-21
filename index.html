@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Babel Standalone para transformar JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f8fafc; }
         .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media print { .no-print { display: none !important; } #printable-area { margin: 0 !important; padding: 0 !important; } }
     </style>
+
     <script type="importmap">
 {
   "imports": {
@@ -30,7 +34,7 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Un solo archivo para evitar errores de carga de módulos en GitHub Pages -->
+    <!-- Cargamos el archivo index.js como tipo text/babel para que Babel lo procese -->
     <script type="text/babel" data-presets="react" src="./index.js"></script>
 </body>
 </html>

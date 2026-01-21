@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// --- CONFIGURACIÓN ---
+// --- CONFIGURACIÓN Y DATOS ---
 const FORMATIVE_FIELDS = [
   { id: 'lenguajes', name: 'Lenguajes', color: 'bg-indigo-600' },
   { id: 'saberes', name: 'Saberes y Pensamiento Científico', color: 'bg-emerald-600' },
@@ -54,7 +54,6 @@ const ProjectForm = ({ data, setData }) => {
         <div><label className={labelClass}>Grado</label><input className={inputClass} value={data.grade} onChange={e => setData({...data, grade: e.target.value})} placeholder="Ej. 1° Grado" /></div>
         <div><label className={labelClass}>Temporalidad</label><input className={inputClass} value={data.temporality} onChange={e => setData({...data, temporality: e.target.value})} placeholder="Ej. 2 semanas" /></div>
       </div>
-
       <div className="space-y-6">
         {data.disciplines.map((d, i) => (
           <div key={i} className="border border-slate-100 p-6 rounded-3xl bg-white shadow-sm relative group">
@@ -68,12 +67,12 @@ const ProjectForm = ({ data, setData }) => {
               </div>
               <div><label className={labelClass}>Disciplina</label><input className={inputClass} value={d.discipline} onChange={e => updateDisc(i, { discipline: e.target.value })} /></div>
               <div><label className={labelClass}>Contenido</label><textarea className={inputClass} value={d.content} onChange={e => updateDisc(i, { content: e.target.value })} /></div>
-              <div><label className={labelClass}>PDA (Procesos de Desarrollo)</label><textarea className={inputClass} value={d.pda} onChange={e => updateDisc(i, { pda: e.target.value })} /></div>
-              <div><label className={labelClass}>Orientaciones y Actividades</label><textarea className={`${inputClass} h-32`} value={d.activityGeneralities} onChange={e => updateDisc(i, { activityGeneralities: e.target.value })} /></div>
+              <div><label className={labelClass}>PDA</label><textarea className={inputClass} value={d.pda} onChange={e => updateDisc(i, { pda: e.target.value })} /></div>
+              <div><label className={labelClass}>Orientaciones</label><textarea className={`${inputClass} h-32`} value={d.activityGeneralities} onChange={e => updateDisc(i, { activityGeneralities: e.target.value })} /></div>
             </div>
           </div>
         ))}
-        <button onClick={addDisc} className="w-full py-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:bg-indigo-50 transition-all hover:text-indigo-600 hover:border-indigo-200">+ AGREGAR DISCIPLINA</button>
+        <button onClick={addDisc} className="w-full py-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:bg-indigo-50 transition-all">+ AGREGAR DISCIPLINA</button>
       </div>
     </div>
   );
@@ -88,15 +87,14 @@ const DocumentPreview = forwardRef(({ data }, ref) => {
       <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
         <div className="w-2/3">
           <p className="font-bold text-[14px] uppercase">{data.schoolName || 'Escuela Normal Superior'}</p>
-          <p className="text-[10px] font-bold">Ciclo: <span className="font-normal">{data.schoolYear}</span></p>
+          <p className="text-[10px] font-bold">Ciclo: <span className="font-normal">2025-2026</span></p>
           <p className="text-[10px] font-bold">Grado: <span className="font-normal">{data.grade || '___'}</span></p>
         </div>
         <div className="w-1/3 text-right">
-          <p className="text-[10px] font-bold uppercase">Planeación Codiseño</p>
+          <p className="text-[10px] font-bold uppercase tracking-tighter">Planeación Docente</p>
           <p className="text-[10px] font-bold">Temporalidad: <span className="font-normal">{data.temporality || '___'}</span></p>
         </div>
       </div>
-
       <div className="mb-6">
         <div className={headerClass}>1. Proyecto Interdisciplinario</div>
         <table className="w-full border-collapse">
@@ -109,7 +107,6 @@ const DocumentPreview = forwardRef(({ data }, ref) => {
           </tbody>
         </table>
       </div>
-
       {data.disciplines.map((d, i) => (
         <div key={i} className="mb-6 break-inside-avoid">
           <table className="w-full border-collapse">
@@ -126,7 +123,7 @@ const DocumentPreview = forwardRef(({ data }, ref) => {
               </tr>
               <tr>
                 <td className={cellClass} colSpan="2">
-                  <span className="font-bold">Orientaciones Generales:</span><br/>
+                  <span className="font-bold">Orientaciones:</span><br/>
                   <div className="whitespace-pre-wrap mt-1">{d.activityGeneralities}</div>
                 </td>
               </tr>
@@ -134,7 +131,6 @@ const DocumentPreview = forwardRef(({ data }, ref) => {
           </table>
         </div>
       ))}
-
       <div className="mt-20 flex flex-col items-center">
         <div className="w-48 border-t border-black mb-1"></div>
         <p className="text-[9px] font-bold uppercase">Vo. Bo. Dirección Escolar</p>
@@ -143,11 +139,9 @@ const DocumentPreview = forwardRef(({ data }, ref) => {
   );
 });
 
-// --- APP PRINCIPAL ---
 const App = () => {
   const [data, setData] = useState({
     schoolName: '',
-    schoolYear: '2025-2026',
     grade: '',
     projectName: '',
     temporality: '',
@@ -160,8 +154,7 @@ const App = () => {
     setLoading(true);
     const element = document.getElementById('printable-area');
     const opt = { 
-      margin: 10, 
-      filename: 'Planeacion_ENS.pdf', 
+      margin: 10, filename: 'Planeacion_ENS.pdf', 
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
@@ -180,9 +173,9 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-indigo-100">
+    <div className="min-h-screen flex flex-col">
       {loading && (
-        <div className="fixed inset-0 z-[100] bg-white/90 flex flex-col items-center justify-center animate-pulse">
+        <div className="fixed inset-0 z-[100] bg-white/90 flex flex-col items-center justify-center">
           <div className="loader-spin mb-4"></div>
           <p className="text-xs font-bold text-slate-800 tracking-widest uppercase">Generando PDF...</p>
         </div>
@@ -194,12 +187,11 @@ const App = () => {
         </div>
       </main>
       <footer className="py-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-        Digital ENS © 2025 | Escuela Normal Superior "Moisés Sáenz Garza"
+        Digital ENS © 2025 | Escuela Normal Superior
       </footer>
     </div>
   );
 };
 
-// Renderizado
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);
