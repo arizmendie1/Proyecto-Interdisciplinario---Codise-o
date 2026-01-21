@@ -58,8 +58,8 @@ const MiniCalendar: React.FC<{ onSelect: (range: string) => void; onClose: () =>
           {currentMonth.toLocaleString('es-MX', { month: 'long', year: 'numeric' })}
         </h3>
         <div className="flex gap-1">
-          <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-1 hover:bg-slate-100 rounded"><i className="fas fa-chevron-left text-xs"></i></button>
-          <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-1 hover:bg-slate-100 rounded"><i className="fas fa-chevron-right text-xs"></i></button>
+          <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-1 hover:bg-slate-100 rounded" aria-label="Mes anterior"><i className="fas fa-chevron-left text-xs"></i></button>
+          <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-1 hover:bg-slate-100 rounded" aria-label="Siguiente mes"><i className="fas fa-chevron-right text-xs"></i></button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center mb-2">
@@ -70,6 +70,7 @@ const MiniCalendar: React.FC<{ onSelect: (range: string) => void; onClose: () =>
         {Array.from({ length: daysInMonth(currentMonth.getFullYear(), currentMonth.getMonth()) }).map((_, i) => (
           <button 
             key={i} 
+            type="button"
             onClick={() => handleDateClick(i + 1)} 
             className={`text-xs h-8 w-8 flex items-center justify-center rounded-lg hover:bg-indigo-50 ${startDate?.getDate() === i + 1 && startDate?.getMonth() === currentMonth.getMonth() ? 'bg-indigo-600 text-white' : ''}`}
           >
@@ -169,7 +170,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
             <label className={labelStyles}>1.5 Temporalidad</label>
             <div className="relative">
               <input type="text" value={data.temporality} onChange={(e) => updateData({ temporality: e.target.value })} placeholder="Ej: Del 15 al 30 de Octubre..." className={`${inputStyles} w-full pr-12`} />
-              <button onClick={() => setShowCalendar(!showCalendar)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-600 transition-colors">
+              <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-600 transition-colors">
                 <i className="fas fa-calendar-alt"></i>
               </button>
               {showCalendar && <MiniCalendar onSelect={(r) => updateData({ temporality: r })} onClose={() => setShowCalendar(false)} />}
@@ -177,9 +178,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
           </div>
           <div className="flex flex-col">
             <label className={labelStyles}>1.3 Nombre del Proyecto</label>
-            <div className="flex gap-2 relative">
-              <input type="text" value={data.projectName} onChange={(e) => updateData({ projectName: e.target.value })} placeholder="Ej: Guardianes del Planeta..." className={inputStyles} />
-            </div>
+            <input type="text" value={data.projectName} onChange={(e) => updateData({ projectName: e.target.value })} placeholder="Ej: Guardianes del Planeta..." className={inputStyles} />
           </div>
         </div>
       </section>
@@ -198,7 +197,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
           return (
             <div key={idx} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative group animate-fadeIn">
               {data.disciplines.length > 1 && (
-                <button onClick={() => updateData({ disciplines: data.disciplines.filter((_, i) => i !== idx) })} className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white border border-slate-200 text-rose-500 shadow-md hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center z-10">
+                <button type="button" onClick={() => updateData({ disciplines: data.disciplines.filter((_, i) => i !== idx) })} className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white border border-slate-200 text-rose-500 shadow-md hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center z-10">
                   <i className="fas fa-times text-xs"></i>
                 </button>
               )}
@@ -208,7 +207,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
                   <label className={labelStyles}>2.1 Campo Formativo</label>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
                     {FORMATIVE_FIELDS.map(f => (
-                      <button key={f.id} onClick={() => updateDiscipline(idx, { field: f.name, discipline: '', content: '', pda: '', evaluation: '', activityGeneralities: '' })} className={`px-4 py-3 rounded-2xl text-[10px] font-bold border-2 transition-all ${entry.field === f.name ? `${f.color} text-white border-transparent shadow-lg scale-[1.02]` : 'bg-white border-slate-100 text-slate-500 hover:border-indigo-100 hover:bg-slate-50'}`}>{f.name}</button>
+                      <button key={f.id} type="button" onClick={() => updateDiscipline(idx, { field: f.name, discipline: '', content: '', pda: '', evaluation: '', activityGeneralities: '' })} className={`px-4 py-3 rounded-2xl text-[10px] font-bold border-2 transition-all ${entry.field === f.name ? `${f.color} text-white border-transparent shadow-lg scale-[1.02]` : 'bg-white border-slate-100 text-slate-500 hover:border-indigo-100 hover:bg-slate-50'}`}>{f.name}</button>
                     ))}
                   </div>
                 </div>
@@ -225,7 +224,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
                   <div className="flex justify-between items-center mb-1">
                     <label className={labelStyles}>2.3 Contenido</label>
                     {isContentManual && (
-                      <button onClick={() => toggleManual(idx, 'content')} className="text-[9px] text-indigo-600 font-bold hover:underline mb-1">Regresar a lista</button>
+                      <button type="button" onClick={() => toggleManual(idx, 'content')} className="text-[9px] text-indigo-600 font-bold hover:underline mb-1">Regresar a lista</button>
                     )}
                   </div>
                   {isContentManual ? (
@@ -261,7 +260,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
                   <div className="flex justify-between items-center">
                     <label className={labelStyles}>2.4 Procesos de Desarrollo de Aprendizaje (PDA)</label>
                     {isPDAManual && (
-                      <button onClick={() => toggleManual(idx, 'pda')} className="text-[9px] text-indigo-600 font-bold hover:underline">Regresar a lista</button>
+                      <button type="button" onClick={() => toggleManual(idx, 'pda')} className="text-[9px] text-indigo-600 font-bold hover:underline">Regresar a lista</button>
                     )}
                   </div>
                   
@@ -291,6 +290,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
                       })}
                       
                       <button 
+                        type="button"
                         onClick={() => toggleManual(idx, 'pda')}
                         className="w-full p-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all flex items-center justify-center gap-2"
                       >
@@ -352,6 +352,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, updateData }) => {
 
         <div className="flex justify-center pt-8 pb-20">
           <button 
+            type="button"
             onClick={() => updateData({ disciplines: [...data.disciplines, { field: 'Lenguajes', discipline: '', content: '', pda: '', evaluation: '', activityGeneralities: '' }] })}
             className="group flex flex-col items-center gap-4 p-10 bg-white border-2 border-dashed border-slate-100 text-slate-300 rounded-[3rem] hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 transition-all shadow-sm hover:shadow-2xl active:scale-95 w-full max-w-lg"
           >

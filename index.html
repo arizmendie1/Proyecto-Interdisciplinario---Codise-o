@@ -4,50 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGITAL ENS - Planificación Docente</title>
+    <title>DIGITAL ENS - Planeación Docente</title>
     
-    <!-- Metatags para evitar problemas de caché en despliegues -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Librería para descarga directa de PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; padding: 0; }
         @media print {
-            @page {
-                margin: 1.5cm;
-                size: letter portrait;
-            }
+            @page { margin: 1cm; size: letter portrait; }
             .no-print { display: none !important; }
             body { background: white !important; }
         }
-
         .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .loader-spin {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #4f46e5;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Estilos para scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #818cf8; }
     </style>
 
     <script type="importmap">
@@ -64,8 +46,6 @@
 </head>
 <body class="bg-slate-100 text-slate-900">
     <div id="root"></div>
-    
-    <!-- Punto de entrada principal con type="module" -->
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>
